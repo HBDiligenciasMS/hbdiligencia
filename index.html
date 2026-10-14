@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HB Diligências - Controladoria Jurídica & Gestão Financeira</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#070A12',
+                            cardBg: '#0F172A',
+                            blue: '#2563EB',
+                            blueHover: '#1D4ED8',
+                            orange: '#F97316',
+                            orangeHover: '#EA580C',
+                            whatsapp: '#22C55E'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #E2E8F0; }
+        ::-webkit-scrollbar-thumb { background: #94A3B8; border-radius: 4px; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col bg-slate-100">
+
+    <!-- TELA DE LOGIN RESTRITA -->
+    <div id="login-screen" class="fixed inset-0 bg-brand-dark z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border-t-8 border-brand-orange relative overflow-hidden">
+            <div class="flex flex-col items-center justify-center space-y-3 mb-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-dark rounded-3xl flex items-center justify-center shadow-2xl border border-slate-800 relative">
+                    <svg class="w-14 h-14" viewBox="0 0 100 100" fill="none">
+                        <path d="M50 10 L82 24 V48 C82 68 68 84 50 90 C32 84 18 68 18 48 V24 L50 10 Z" fill="#0F172A" stroke="#2563EB" stroke-width="3"/>
+                        <path d="M34 32 V68 M34 50 H46 M46 32 V68" stroke="#2563EB" stroke-width="5" stroke-linecap="round"/>
+                        <path d="M54 32 V68 M54 32 H64 C68 32 71 35 71 39 C71 43 68 46 64 46 H54 M54 46 H65 C69 46 72 49 72 53.5 C72 58 69 68 65 68 H54" stroke="#F97316" stroke-width="5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="text-center">
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">HB <span class="text-brand-orange">DILIGÊNCIAS</span></h2>
+                    <p class="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest mt-0.5">Controladoria & Gestão Jurídica</p>
+                </div>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div id="login-error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-bold text-center">
+                    E-mail ou senha incorretos! Acesso negado.
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">E-mail Autorizado</label>
+                    <input type="email" id="login-email" required value="hbdiligenciasms@gmail.com" class="w-full px-4 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-brand-blue focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Senha de Acesso</label>
+                    <input type="password" id="login-password" required value="lindao00**" class="w-full px-4 py-3 border rounded-xl text-sm focus:ring-2 focus:ring-brand-blue focus:outline-none">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-brand-blue hover:bg-brand-blueHover text-white font-bold rounded-xl transition shadow-lg flex items-center justify-center gap-2">
+                    <i data-lucide="lock" class="w-4 h-4"></i> Entrar no Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL -->
+    <div id="app-container" class="hidden min-h-screen flex flex-col">
+        <header class="bg-slate-950 text-white shadow-xl border-b border-slate-800 sticky top-0 z-40 no-print">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <h1 class="font-black text-lg tracking-tight text-white flex items-center gap-1">
+                        HB <span class="text-brand-orange">DILIGÊNCIAS</span>
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openReportsModal()" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-xl transition font-bold shadow-md">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Relatórios
+                    </button>
+                    <button onclick="openModalForCreate()" class="flex items-center gap-1 bg-brand-orange hover:bg-brand-orangeHover text-white text-xs sm:text-sm px-4 py-2 rounded-xl font-bold transition shadow-md">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Nova Diligência
+                    </button>
+                    <button onclick="logout()" title="Sair" class="p-2 bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white rounded-xl transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+            <!-- PAINEL FINANCEIRO DE RESUMO -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Recebido no Ano</p>
+                        <h3 id="stat-year-paid" class="text-lg font-black text-slate-900 mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                        <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Recebido no Mês Selecionado</p>
+                        <h3 id="stat-month-paid" class="text-lg font-black text-emerald-600 mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Em Aberto Para Receber</p>
+                        <h3 id="stat-open-pending" class="text-lg font-black text-brand-orange mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-brand-orange flex items-center justify-center font-bold">
+                        <i data-lucide="hourglass" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Em Aberto Vencido (Atrasado)</p>
+                        <h3 id="stat-open-overdue" class="text-lg font-black text-rose-600 mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                        <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200 no-print">
+                <div class="flex items-center justify-between mb-2 px-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="calendar-range" class="w-4 h-4 text-brand-blue"></i> Mês de Competência
+                    </span>
+                    <button onclick="selectMonth('ALL')" id="btn-month-ALL" class="text-xs font-bold px-3 py-1 rounded-lg transition bg-slate-900 text-white">
+                        Todos os Meses
+                    </button>
+                </div>
+                <div class="flex items-center gap-2 overflow-x-auto pb-1" id="months-bar-container"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+                        <button onclick="setStatusCategory('pending')" id="cat-btn-pending" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-orange text-white shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i data-lucide="hourglass" class="w-3.5 h-3.5"></i> Atendidas / A Receber (No Prazo)
+                        </button>
+                        <button onclick="setStatusCategory('overdue')" id="cat-btn-overdue" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Atendidas / Vencidas (Atrasadas)
+                        </button>
+                        <button onclick="setStatusCategory('paid')" id="cat-btn-paid" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 transition flex items-center gap-1.5 whitespace-nowrap">
+                            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Recebidas / Guardadas
+                        </button>
+                    </div>
+
+                    <div class="relative max-w-xs w-full">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="search-input" oninput="renderApp()" placeholder="Buscar empresa, serviço ou demanda..." class="w-full pl-9 pr-4 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 font-bold text-[11px] uppercase tracking-wider border-b border-slate-200">
+                                <th class="py-3.5 px-4">Início / Previsão Recebimento</th>
+                                <th class="py-3.5 px-4">Andamento</th>
+                                <th class="py-3.5 px-4">Serviço / Relatório Demanda</th>
+                                <th class="py-3.5 px-4">Status</th>
+                                <th class="py-3.5 px-4">Empresa / Plataforma</th>
+                                <th class="py-3.5 px-4">Valor</th>
+                                <th class="py-3.5 px-4">Anexos PDF</th>
+                                <th class="py-3.5 px-4 text-right no-print">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+
+                <div id="empty-state" class="hidden text-center py-12 px-4">
+                    <i data-lucide="folder-open" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+                    <p class="text-slate-600 font-bold text-sm">Nenhuma diligência encontrada.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL CADASTRO/EDIÇÃO -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b">
+                <h3 id="modal-title" class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="file-plus" class="w-5 h-5 text-brand-orange"></i> Lançar Diligência
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+
+            <form id="diligence-form" onsubmit="handleSaveDiligence(event)" class="p-6 space-y-4 overflow-y-auto flex-1">
+                <input type="hidden" id="input-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Empresa / Contratante *</label>
+                        <input type="text" id="input-company" required placeholder="Ex: Banco X" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Plataforma / App *</label>
+                        <input type="text" id="input-app" required placeholder="Ex: Jurídico Certo" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tipo de Serviço Realizado *</label>
+                        <input type="text" id="input-service-type" required placeholder="Ex: Cópia, Protocolo, Mandado" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Andamento *</label>
+                        <select id="input-fulfillment" required class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                            <option value="Pendente Atendimento">Pendente de Atendimento</option>
+                            <option value="Atendida">Atendida / Realizada</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Relatório da Demanda / Detalhes *</label>
+                    <textarea id="input-demand-report" rows="2" required placeholder="Ex: Processo nº 00000-00.2026.8.12.0001, Fórum Central..." class="w-full px-3 py-2 border rounded-xl text-sm bg-white"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status Pagamento *</label>
+                        <select id="input-status" required onchange="togglePaymentDateInput()" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                            <option value="Pendente">Pendente de Pagamento</option>
+                            <option value="Pago">Pago / Recebido</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Valor (R$) *</label>
+                        <input type="number" step="0.01" min="0" id="input-value" required placeholder="0,00" class="w-full px-3 py-2 border rounded-xl text-sm">
+                    </div>
+                </div>
+
+                <div id="payment-date-container" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                    <label class="block text-xs font-bold text-emerald-800 uppercase mb-1">Recebido em (Data do Pagamento) *</label>
+                    <input type="date" id="input-paid-date" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Data para Iniciar Serviço *</label>
+                        <input type="date" id="input-date" required class="w-full px-3 py-2 border rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Prazo Recebimento *</label>
+                        <select id="input-period" required onchange="toggleCustomPeriod()" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                            <option value="1">01 dia</option>
+                            <option value="2">02 dias</option>
+                            <option value="3">03 dias</option>
+                            <option value="4">04 dias</option>
+                            <option value="5">05 dias</option>
+                            <option value="6">06 dias</option>
+                            <option value="7">07 dias</option>
+                            <option value="8">08 dias</option>
+                            <option value="9">09 dias</option>
+                            <option value="10">10 dias</option>
+                            <option value="15" selected>15 dias</option>
+                            <option value="30">30 dias</option>
+                            <option value="45">45 dias</option>
+                            <option value="60">60 dias</option>
+                            <option value="custom">Outros (digitar)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="custom-period-container" class="hidden">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Quantos dias de prazo? *</label>
+                    <input type="number" min="1" id="input-custom-period" placeholder="Ex: 20" class="w-full px-3 py-2 border rounded-xl text-sm">
+                </div>
+
+                <div class="space-y-2 bg-slate-50 border p-3 rounded-xl">
+                    <label class="block text-xs font-bold text-slate-700 uppercase">Anexar Documentos PDF</label>
+                    <input type="file" id="input-pdf-multiple" accept=".pdf" multiple class="w-full text-xs text-slate-500">
+                    <div id="current-attached-files-list" class="text-xs text-slate-600"></div>
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-3 border-t">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-xl text-xs font-bold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold shadow-md">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE RELATÓRIOS COMPLETO -->
+    <div id="reports-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-950 px-6 py-4 flex items-center justify-between border-b border-slate-800 no-print">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-indigo-400"></i> Relatório Financeiro e Operacional
+                </h3>
+                <button onclick="closeReportsModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-6 overflow-y-auto flex-1">
+                <!-- Cards Resumo no Relatório -->
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="p-3 bg-slate-100 rounded-xl border">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">Total Geral</p>
+                        <h4 id="rep-val-total" class="text-lg font-black text-slate-900">R$ 0,00</h4>
+                    </div>
+                    <div class="p-3 bg-orange-50 rounded-xl border border-orange-100">
+                        <p class="text-[10px] font-bold text-brand-orange uppercase">Total Pendente / Aberto</p>
+                        <h4 id="rep-val-pending" class="text-lg font-black text-brand-orange">R$ 0,00</h4>
+                    </div>
+                    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <p class="text-[10px] font-bold text-emerald-700 uppercase">Total Recebido</p>
+                        <h4 id="rep-val-paid" class="text-lg font-black text-emerald-700">R$ 0,00</h4>
+                    </div>
+                </div>
+
+                <!-- Tabela de Relatório Detalhado -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Detalhamento das Diligências</h4>
+                    <div class="overflow-x-auto border rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 font-bold border-b text-slate-700">
+                                    <th class="p-2.5">Data Início</th>
+                                    <th class="p-2.5">Empresa</th>
+                                    <th class="p-2.5">Serviço / Demanda</th>
+                                    <th class="p-2.5">Status Pagamento</th>
+                                    <th class="p-2.5 text-right">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t flex justify-end gap-2 no-print">
+                <button onclick="closeReportsModal()" class="px-4 py-2 border rounded-xl text-xs font-bold">Fechar</button>
+                <button onclick="window.print()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+                    <i data-lucide="printer" class="w-4 h-4"></i> Imprimir / Salvar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DO SISTEMA -->
+    <script>
+        const STORAGE_KEY = 'hb_diligencias_v28_data';
+        const AUTHORIZED_EMAIL = 'hbdiligenciasms@gmail.com';
+        const AUTHORIZED_PASS = 'lindao00**';
+
+        let diligences = [];
+        let selectedMonthFilter = 'ALL';
+        let selectedCategory = 'pending';
+
+        const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('input-date').valueAsDate = new Date();
+            renderMonthsBar();
+            loadData();
+            lucide.createIcons();
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const pass = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('login-error-msg');
+
+            if(email === AUTHORIZED_EMAIL && pass === AUTHORIZED_PASS) {
+                errorMsg.classList.add('hidden');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-container').classList.add('hidden');
+            document.getElementById('login-password').value = '';
+        }
+
+        function renderMonthsBar() {
+            const container = document.getElementById('months-bar-container');
+            container.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            MONTH_NAMES.forEach((m, idx) => {
+                const monthCode = `${currentYear}-${String(idx + 1).padStart(2, '0')}`;
+                container.innerHTML += `<button id="btn-month-${monthCode}" onclick="selectMonth('${monthCode}')" class="px-3 py-1.5 text-xs font-bold rounded-xl border bg-slate-50 text-slate-700 whitespace-nowrap">${m}</button>`;
+            });
+        }
+
+        function selectMonth(m) {
+            selectedMonthFilter = m;
+            document.querySelectorAll('#months-bar-container button, #btn-month-ALL').forEach(b => b.className = "px-3 py-1.5 text-xs font-bold rounded-xl border bg-slate-50 text-slate-700 whitespace-nowrap");
+            const btn = document.getElementById(`btn-month-${m}`);
+            if(btn) btn.className = "px-3 py-1.5 text-xs font-bold rounded-xl bg-brand-orange text-white whitespace-nowrap shadow-sm";
+            renderApp();
+        }
+
+        function setStatusCategory(cat) {
+            selectedCategory = cat;
+            ['pending', 'overdue', 'paid'].forEach(c => {
+                const b = document.getElementById(`cat-btn-${c}`);
+                if(b) {
+                    if(c === cat) {
+                        b.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-orange text-white shadow-sm flex items-center gap-1.5 whitespace-nowrap';
+                    } else {
+                        b.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 text-slate-700 flex items-center gap-1.5 whitespace-nowrap';
+                    }
+                }
+            });
+            renderApp();
+        }
+
+        function getDueDate(dateStr, periodDays) {
+            if(!dateStr) return new Date();
+            const p = dateStr.split('-');
+            const d = new Date(p[0], p[1]-1, p[2]);
+            d.setDate(d.getDate() + parseInt(periodDays || 0));
+            return d;
+        }
+
+        function togglePaymentDateInput() {
+            const status = document.getElementById('input-status').value;
+            const container = document.getElementById('payment-date-container');
+            const paidDateInput = document.getElementById('input-paid-date');
+            if(status === 'Pago') {
+                container.classList.remove('hidden');
+                if(!paidDateInput.value) paidDateInput.valueAsDate = new Date();
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function toggleCustomPeriod() {
+            const periodVal = document.getElementById('input-period').value;
+            const container = document.getElementById('custom-period-container');
+            if(periodVal === 'custom') {
+                container.classList.remove('hidden');
+                document.getElementById('input-custom-period').required = true;
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('input-custom-period').required = false;
+            }
+        }
+
+        function loadData() {
+            diligences = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            renderApp();
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(diligences));
+            renderApp();
+        }
+
+        function updateFinancialStats() {
+            const currentYear = new Date().getFullYear().toString();
+            let yearPaid = 0;
+            let monthPaid = 0;
+            let openPending = 0;
+            let openOverdue = 0;
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            diligences.forEach(d => {
+                const val = parseFloat(d.value) || 0;
+                const dueDate = getDueDate(d.date, d.period); dueDate.setHours(0,0,0,0);
+
+                if (d.status === 'Pago' && d.paidDate) {
+                    if (d.paidDate.startsWith(currentYear)) {
+                        yearPaid += val;
+                    }
+                    if (selectedMonthFilter !== 'ALL' && d.paidDate.startsWith(selectedMonthFilter)) {
+                        monthPaid += val;
+                    } else if (selectedMonthFilter === 'ALL' && d.paidDate.startsWith(currentYear + '-' + String(today.getMonth() + 1).padStart(2, '0'))) {
+                        monthPaid += val;
+                    }
+                } else if (d.status === 'Pendente') {
+                    const matchesMonth = (selectedMonthFilter === 'ALL' || d.date.startsWith(selectedMonthFilter) || dueDate.toISOString().startsWith(selectedMonthFilter));
+                    if (matchesMonth) {
+                        if (dueDate >= today) {
+                            openPending += val;
+                        } else {
+                            openOverdue += val;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('stat-year-paid').textContent = `R$ ${yearPaid.toFixed(2).replace('.', ',')}`;
+            document.getElementById('stat-month-paid').textContent = `R$ ${monthPaid.toFixed(2).replace('.', ',')}`;
+            document.getElementById('stat-open-pending').textContent = `R$ ${openPending.toFixed(2).replace('.', ',')}`;
+            document.getElementById('stat-open-overdue').textContent = `R$ ${openOverdue.toFixed(2).replace('.', ',')}`;
+        }
+
+        function renderApp() {
+            updateFinancialStats();
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const today = new Date(); today.setHours(0,0,0,0);
+
+            let filtered = diligences.filter(d => {
+                if(selectedMonthFilter !== 'ALL' && !d.date.startsWith(selectedMonthFilter)) return false;
+                const matchSearch = (d.company || '').toLowerCase().includes(searchVal) || 
+                                    (d.serviceType || '').toLowerCase().includes(searchVal) || 
+                                    (d.demandReport || '').toLowerCase().includes(searchVal);
+                if(!matchSearch) return false;
+
+                const dueDate = getDueDate(d.date, d.period); dueDate.setHours(0,0,0,0);
+
+                if(selectedCategory === 'paid') return d.status === 'Pago';
+                if(selectedCategory === 'pending') return d.status === 'Pendente' && dueDate >= today;
+                if(selectedCategory === 'overdue') return d.status === 'Pendente' && dueDate < today;
+                return true;
+            });
+
+            const tbody = document.getElementById('table-body');
+            const emptyState = document.getElementById('empty-state');
+            tbody.innerHTML = '';
+
+            if(filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            filtered.forEach(d => {
+                const startDate = d.date ? d.date.split('-').reverse().join('/') : '-';
+                const due = getDueDate(d.date, d.period);
+                let dueDisplay = due.toLocaleDateString('pt-BR');
+                
+                let dateDisplay = `Início: ${startDate}<br><span class="text-xs text-slate-500">Previsão: ${dueDisplay}</span>`;
+                if(d.status === 'Pago' && d.paidDate) {
+                    dateDisplay = `<span class="text-emerald-700 font-bold" title="Recebido em">Recebido em: ${d.paidDate.split('-').reverse().join('/')}</span>`;
+                }
+
+                let pdfs = d.files && d.files.length > 0 ? d.files.map((f, i) => `<button onclick="viewFile('${d.id}', ${i})" class="text-[11px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">${f.name}</button>`).join('') : '<span class="text-slate-400 text-xs">Nenhum</span>';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b">
+                        <td class="py-3.5 px-4">${dateDisplay}</td>
+                        <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-100 text-sky-800">${d.fulfillment}</span></td>
+                        <td class="py-3.5 px-4">
+                            <strong class="text-slate-900">${d.serviceType || '-'}</strong>
+                            <p class="text-xs text-slate-500 mt-0.5 max-w-xs">${d.demandReport || ''}</p>
+                        </td>
+                        <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${d.status==='Pago'?'bg-emerald-100 text-emerald-800':'bg-orange-100 text-orange-800'}">${d.status}</span></td>
+                        <td class="py-3.5 px-4"><strong class="text-slate-900">${d.company}</strong><br><span class="text-xs text-slate-500">${d.app}</span></td>
+                        <td class="py-3.5 px-4 font-extrabold">R$ ${parseFloat(d.value).toFixed(2).replace('.', ',')}</td>
+                        <td class="py-3.5 px-4 flex flex-wrap gap-1">${pdfs}</td>
+                        <td class="py-3.5 px-4 text-right space-x-1">
+                            <button onclick="openModalForEdit('${d.id}')" class="p-1.5 text-slate-500 hover:text-blue-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            <button onclick="deleteItem('${d.id}')" class="p-1.5 text-slate-500 hover:text-rose-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function viewFile(id, idx) {
+            const item = diligences.find(d => d.id === id);
+            if(!item || !item.files[idx]) return;
+            const win = window.open();
+            win.document.write(`<iframe src="${item.files[idx].data}" style="width:100%;height:100vh;border:none;"></iframe>`);
+        }
+
+        function handleSaveDiligence(e) {
+            e.preventDefault();
+            const id = document.getElementById('input-id').value;
+            const company = document.getElementById('input-company').value;
+            const app = document.getElementById('input-app').value;
+            const serviceType = document.getElementById('input-service-type').value;
+            const demandReport = document.getElementById('input-demand-report').value;
+            const fulfillment = document.getElementById('input-fulfillment').value;
+            const status = document.getElementById('input-status').value;
+            const paidDate = document.getElementById('input-paid-date').value;
+            const date = document.getElementById('input-date').value;
+            
+            let period = document.getElementById('input-period').value;
+            if(period === 'custom') {
+                period = document.getElementById('input-custom-period').value;
+            }
+
+            const value = document.getElementById('input-value').value;
+            const fileInput = document.getElementById('input-pdf-multiple').files;
+
+            let existing = id ? diligences.find(d => d.id === id) : null;
+            let files = existing ? (existing.files || []) : [];
+
+            if(fileInput.length === 0) {
+                saveRecord(id, company, app, serviceType, demandReport, fulfillment, status, paidDate, date, period, value, files);
+                return;
+            }
+
+            let loaded = 0;
+            for(let i=0; i<fileInput.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    files.push({ name: fileInput[i].name, data: evt.target.result });
+                    loaded++;
+                    if(loaded === fileInput.length) {
+                        saveRecord(id, company, app, serviceType, demandReport, fulfillment, status, paidDate, date, period, value, files);
+                    }
+                };
+                reader.readAsDataURL(fileInput[i]);
+            }
+        }
+
+        function saveRecord(id, company, app, serviceType, demandReport, fulfillment, status, paidDate, date, period, value, files) {
+            if(id) {
+                const idx = diligences.findIndex(d => d.id === id);
+                if(idx !== -1) diligences[idx] = { ...diligences[idx], company, app, serviceType, demandReport, fulfillment, status, paidDate: status==='Pago'?paidDate:'', date, period, value, files };
+            } else {
+                diligences.push({ id: Date.now().toString(), company, app, serviceType, demandReport, fulfillment, status, paidDate: status==='Pago'?paidDate:'', date, period, value, files });
+            }
+            saveData();
+            closeModal();
+        }
+
+        function openModalForCreate() {
+            document.getElementById('diligence-form').reset();
+            document.getElementById('input-id').value = '';
+            document.getElementById('input-date').valueAsDate = new Date();
+            document.getElementById('payment-date-container').classList.add('hidden');
+            document.getElementById('custom-period-container').classList.add('hidden');
+            document.getElementById('current-attached-files-list').innerHTML = '';
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function openModalForEdit(id) {
+            const item = diligences.find(d => d.id === id);
+            if(!item) return;
+            document.getElementById('input-id').value = item.id;
+            document.getElementById('input-company').value = item.company;
+            document.getElementById('input-app').value = item.app;
+            document.getElementById('input-service-type').value = item.serviceType || '';
+            document.getElementById('input-demand-report').value = item.demandReport || '';
+            document.getElementById('input-fulfillment').value = item.fulfillment;
+            document.getElementById('input-status').value = item.status;
+            document.getElementById('input-paid-date').value = item.paidDate || '';
+            document.getElementById('input-date').value = item.date;
+            
+            const periodSelect = document.getElementById('input-period');
+            const standardOptions = ['1','2','3','4','5','6','7','8','9','10','15','30','45','60'];
+            if(standardOptions.includes(String(item.period))) {
+                periodSelect.value = item.period;
+                document.getElementById('custom-period-container').classList.add('hidden');
+            } else {
+                periodSelect.value = 'custom';
+                document.getElementById('custom-period-container').classList.remove('hidden');
+                document.getElementById('input-custom-period').value = item.period;
+            }
+
+            document.getElementById('input-value').value = item.value;
+            togglePaymentDateInput();
+            document.getElementById('current-attached-files-list').innerHTML = item.files?.length ? `Já anexados: ${item.files.map(f=>f.name).join(', ')}` : '';
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+        function deleteItem(id) {
+            if(confirm("Excluir esta diligência?")) {
+                diligences = diligences.filter(d => d.id !== id);
+                saveData();
+            }
+        }
+
+        function openReportsModal() {
+            let total = 0, pending = 0, paid = 0;
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = '';
+            
+            diligences.forEach(d => {
+                const val = parseFloat(d.value) || 0;
+                total += val;
+                if(d.status === 'Pago') paid += val; else pending += val;
+                
+                const startDate = d.date ? d.date.split('-').reverse().join('/') : '-';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2.5">${startDate}</td>
+                        <td class="p-2.5 font-bold">${d.company}</td>
+                        <td class="p-2.5">${d.serviceType || '-'}<br><span class="text-[10px] text-slate-500">${d.demandReport || ''}</span></td>
+                        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${d.status==='Pago'?'bg-emerald-100 text-emerald-800':'bg-orange-100 text-orange-800'}">${d.status}</span></td>
+                        <td class="p-2.5 text-right font-black">R$ ${val.toFixed(2).replace('.', ',')}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('rep-val-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            document.getElementById('rep-val-pending').textContent = `R$ ${pending.toFixed(2).replace('.', ',')}`;
+            document.getElementById('rep-val-paid').textContent = `R$ ${paid.toFixed(2).replace('.', ',')}`;
+            document.getElementById('reports-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeReportsModal() {
+            document.getElementById('reports-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
